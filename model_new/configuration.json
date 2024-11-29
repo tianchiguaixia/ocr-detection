@@ -1,0 +1,89 @@
+{
+    "task": "ocr-detection",
+    "framework": "pytorch",
+    "pipeline": {
+        "type": "resnet18-ocr-detection"
+    },
+    "model": {
+        "type": "OCRDetection",
+        "model_type": "DBNet",
+        "backbone": "resnet18",
+        "inference_kwargs": {
+            "thresh": 0.2,
+            "image_short_side": 736,
+            "return_polygon": false
+        }
+    },
+    "preprocessor": {
+        "type": "ocr-detection"
+    },
+    "train": {
+        "gpu_ids": [0],
+        "max_epochs": 300,
+        "work_dir": "./workdirs",
+        "finetune_path": null,
+        "miscs": {
+            "print_interval_iters": 20,
+            "exp_name": "dbnet_resnet18",
+            "seed": 1234,
+            "eval_interval_epochs": 1,
+            "ckpt_interval_epochs": 1,
+            "save_interval": 3000
+        },
+        "dataloader": {
+            "batch_size_per_gpu": 16,
+            "workers_per_gpu": 4
+        },
+        "transform": {
+            "detection_augment": {
+                "augmenter_args": [
+                    ["Fliplr", 0.5], {
+                        "cls": "Affine",
+                        "rotate": [-10, 10]
+                    },
+                    ["Resize", [0.5, 3.0]]
+                ],
+                "only_resize": false,
+                "keep_ratio": false
+            },
+            "random_crop": {
+                "size": [640, 640],
+                "max_tries": 10
+            },
+            "MakeICDARData": true,
+            "MakeSegDetectionData": true,
+            "MakeBorderMap": true,
+            "NormalizeImage": true
+        }
+    },
+    "evaluation": {
+        "checkpoint_path": null,
+        "thresh": 0.2,
+        "return_polygon": false,
+        "dataloader": {
+            "batch_size": 1
+        },
+        "transform": {
+            "detection_augment": {
+                "augmenter_args": [
+                    ["Resize", {
+                        "width": 1024,
+                        "height": 1024
+                    }]
+                ],
+                "only_resize": true,
+                "keep_ratio": false
+            },
+            "MakeICDARData": true,
+            "MakeSegDetectionData": true,
+            "NormalizeImage": true,
+            "collect_fn": "ICDARCollectFN"
+        }
+    },
+    "dataset": {
+        "train_image_dir": "",
+        "train_image_list": "",
+        "val_image_dir": "",
+        "val_image_list": ""
+    }
+}
