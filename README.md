@@ -5,4 +5,4 @@
 
 
 # 可视化展示
-![Image 1](imgs/test.png)  ![Image 2](imgs/output_test.png)
+![Image 1](./imgs/test.png)  ![Image 2](./imgs/output_test.png)
